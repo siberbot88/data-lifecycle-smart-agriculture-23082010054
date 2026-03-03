@@ -1,0 +1,3 @@
+dataset,path,rows,cols,total_cells,missing_cells,non_null_cells,accuracy,completeness,timeliness_30d,timeliness_col,timeliness_note
+raw,/content/data-lifecycle-smart-agriculture-23082010054/data/raw/cropdata_updated.csv,16411,7,114877,0,114877,1.0,1.0,,,No timestamp/datetime column
+cleaned,/content/data-lifecycle-smart-agriculture-23082010054/outputs/cleaned_data.csv,16283,7,113981,0,113981,1.0,1.0,,,No timestamp/datetime column
