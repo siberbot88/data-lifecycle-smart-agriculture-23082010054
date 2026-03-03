@@ -105,7 +105,7 @@ streamlit run dashboard/app.py
 **Deployment (Streamlit Community Cloud):**
 
 - Main file path: `dashboard/app.py`
-- Public URL: `PASTE_YOUR_STREAMLIT_PUBLIC_URL_HERE`
+- Public URL: `[PASTE_YOUR_STREAMLIT_PUBLIC_URL_HERE](https://data-lifecycle-smart-agriculture-23082010054-dg4kquuqnp8ziu7yd.streamlit.app/)`
 
 ---
 
@@ -161,9 +161,12 @@ Place evidence screenshots in the following paths before final submission:
 
 | File | Content |
 |---|---|
-| `docs/screenshots/dashboard.png` | Streamlit dashboard (full view) |
-| `docs/screenshots/eda.png` | EDA output from Colab |
-| `docs/screenshots/analysis.png` | Cleaning or analysis step from Colab |
+| `<img width="1919" height="973" alt="image" src="https://github.com/user-attachments/assets/2adac17e-1333-4413-86c1-876938274c03" />
+` | Streamlit dashboard (full view) |
+| `<img width="1378" height="776" alt="image" src="https://github.com/user-attachments/assets/1559e431-929f-41d1-9047-410e2673e700" />
+` | EDA output from Colab |
+| `<img width="1403" height="646" alt="image" src="https://github.com/user-attachments/assets/7207bad2-81fe-4c0b-8bb5-f48158fba13f" />
+` | Cleaning or analysis step from Colab |
 
 ---
 
