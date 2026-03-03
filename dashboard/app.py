@@ -1,10 +1,11 @@
-# dashboard/app/app.py
+# dashboard/app.py
 import os
 import numpy as np
 import pandas as pd
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
+from pathlib import Path
 
 # ----------------------------
 # Page config
@@ -99,10 +100,17 @@ def card_html(label: str, value: str, sub: str = "", icon_name: str = "chip") ->
     """
 
 # ----------------------------
-# Data path (works from dashboard/app/)
+# Data path (works from dashboard)
 # ----------------------------
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-DATA_PATH = os.path.join(BASE_DIR, "outputs", "cleaned_data.csv")
+def locate_cleaned_data() -> str:
+    here = Path(__file__).resolve()
+    for p in [here.parent, *here.parents]:
+        candidate = p / "outputs" / "cleaned_data.csv"
+        if candidate.exists():
+            return str(candidate)
+    return ""
+
+DATA_PATH = locate_cleaned_data()
 
 @st.cache_data(show_spinner=False)
 def load_data(path: str) -> pd.DataFrame:
