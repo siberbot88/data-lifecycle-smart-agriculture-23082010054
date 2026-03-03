@@ -105,7 +105,7 @@ streamlit run dashboard/app.py
 **Deployment (Streamlit Community Cloud):**
 
 - Main file path: `dashboard/app.py`
-- Public URL: `[PASTE_YOUR_STREAMLIT_PUBLIC_URL_HERE](https://data-lifecycle-smart-agriculture-23082010054-dg4kquuqnp8ziu7yd.streamlit.app/)`
+- Public URL: (https://data-lifecycle-smart-agriculture-23082010054-dg4kquuqnp8ziu7yd.streamlit.app/)
 
 ---
 
