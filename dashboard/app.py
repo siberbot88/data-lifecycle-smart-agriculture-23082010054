@@ -1,4 +1,4 @@
-
+# dashboard/app/app.py
 import os
 import numpy as np
 import pandas as pd
@@ -16,22 +16,23 @@ st.set_page_config(
 )
 
 # ----------------------------
-# Minimal UI styling
+# Minimal UI styling (formal)
 # ----------------------------
 CSS = """
 <style>
-/* App width and typography */
 .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1200px; }
 h1, h2, h3 { letter-spacing: -0.01em; }
 .small-note { color: #6b7280; font-size: 0.9rem; }
 .section-title { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.2rem; }
 .icon { width: 18px; height: 18px; color: #111827; }
-.card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
-@media (max-width: 1100px) { .card-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 650px) { .card-grid { grid-template-columns: 1fr; } }
+
 .card {
-  border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 14px;
   background: #ffffff;
+  height: 100%;
+  margin-bottom: 0.75rem;
 }
 .card-top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
 .card-label { color: #6b7280; font-size: 0.85rem; margin: 0; }
@@ -83,27 +84,25 @@ def section_header(icon_name: str, title: str, note: str | None = None):
         unsafe_allow_html=True,
     )
 
-def card(label: str, value: str, sub: str = "", icon_name: str = "chip"):
-    st.markdown(
-        f"""
-        <div class="card">
-          <div class="card-top">
-            <div>
-              <p class="card-label">{label}</p>
-              <p class="card-value">{value}</p>
-              <p class="card-sub">{sub}</p>
-            </div>
-            <div class="badge">{icon(icon_name)}<span>Metric</span></div>
-          </div>
+def card_html(label: str, value: str, sub: str = "", icon_name: str = "chip") -> str:
+    return f"""
+    <div class="card">
+      <div class="card-top">
+        <div>
+          <p class="card-label">{label}</p>
+          <p class="card-value">{value}</p>
+          <p class="card-sub">{sub}</p>
         </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        <div class="badge">{icon(icon_name)}<span>Metric</span></div>
+      </div>
+    </div>
+    """
 
 # ----------------------------
-# Data loading
+# Data path (works from dashboard/app/)
 # ----------------------------
-DATA_PATH = "outputs/cleaned_data.csv"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+DATA_PATH = os.path.join(BASE_DIR, "outputs", "cleaned_data.csv")
 
 @st.cache_data(show_spinner=False)
 def load_data(path: str) -> pd.DataFrame:
@@ -112,13 +111,16 @@ def load_data(path: str) -> pd.DataFrame:
     return df
 
 # ----------------------------
-# Page header
+# Header
 # ----------------------------
 st.title("Smart Agriculture Dashboard")
-st.markdown('<div class="small-note">Source: cleaned dataset stored in <code>outputs/cleaned_data.csv</code></div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="small-note">Source: cleaned dataset stored in <code>outputs/cleaned_data.csv</code></div>',
+    unsafe_allow_html=True,
+)
 
 if not os.path.exists(DATA_PATH):
-    st.error(f"File tidak ditemukan: {DATA_PATH}. Pastikan file sudah ada di repo dan branch main.")
+    st.error(f"File not found: {DATA_PATH}. Ensure it exists in the repository.")
     st.stop()
 
 df = load_data(DATA_PATH)
@@ -126,10 +128,10 @@ df = load_data(DATA_PATH)
 required = {"crop_id", "soil_type", "seedling_stage", "moi", "temp", "humidity", "result"}
 missing_cols = required - set(df.columns)
 if missing_cols:
-    st.error(f"Kolom wajib tidak lengkap: {sorted(list(missing_cols))}. Kolom tersedia: {df.columns.tolist()}")
+    st.error(f"Missing required columns: {sorted(list(missing_cols))}. Available: {df.columns.tolist()}")
     st.stop()
 
-# Enforce types
+# Types
 for c in ["moi", "temp", "humidity", "result"]:
     df[c] = pd.to_numeric(df[c], errors="coerce")
 
@@ -144,7 +146,7 @@ order = [s for s in stage_priority if s in stages] + [s for s in sorted(stages) 
 df["seedling_stage"] = pd.Categorical(df["seedling_stage"], categories=order, ordered=True)
 
 # ----------------------------
-# Sidebar filters
+# Sidebar
 # ----------------------------
 st.sidebar.header("Filters")
 crop_opt = ["All"] + sorted(df["crop_id"].unique().tolist())
@@ -152,7 +154,7 @@ soil_opt = ["All"] + sorted(df["soil_type"].unique().tolist())
 
 selected_crop = st.sidebar.selectbox("Crop", crop_opt, index=0)
 selected_soil = st.sidebar.selectbox("Soil type", soil_opt, index=0)
-threshold = st.sidebar.slider("Humidity threshold (alert below)", min_value=0, max_value=100, value=45)
+threshold = st.sidebar.slider("Humidity threshold (alert below)", 0, 100, 45)
 
 dff = df.copy()
 if selected_crop != "All":
@@ -164,24 +166,27 @@ if dff.empty:
     st.warning("No data for the selected filters.")
     st.stop()
 
-# Define "current" (no timestamp exists)
+# Current record (no timestamp)
 current = dff.iloc[-1]
 current_h = float(current["humidity"]) if pd.notnull(current["humidity"]) else np.nan
 current_t = float(current["temp"]) if pd.notnull(current["temp"]) else np.nan
 current_m = float(current["moi"]) if pd.notnull(current["moi"]) else np.nan
 
 # ----------------------------
-# KPI cards
+# KPI (fixed layout using st.columns)
 # ----------------------------
 st.markdown('<div class="hr"></div>', unsafe_allow_html=True)
 section_header("chip", "Key metrics", "Metrics are computed on filtered data.")
 
-st.markdown('<div class="card-grid">', unsafe_allow_html=True)
-card("Rows (filtered)", f"{len(dff):,}", "Number of records after filters.", "chip")
-card("Current humidity", f"{current_h:.1f}", "Last record humidity value.", "droplet")
-card("Current temperature", f"{current_t:.1f}", "Last record temperature value.", "thermometer")
-card("Current moisture index", f"{current_m:.1f}", "Last record MOI value.", "chip")
-st.markdown('</div>', unsafe_allow_html=True)
+k1, k2, k3, k4 = st.columns(4, gap="small")
+with k1:
+    st.markdown(card_html("Rows (filtered)", f"{len(dff):,}", "Number of records after filters.", "chip"), unsafe_allow_html=True)
+with k2:
+    st.markdown(card_html("Current humidity", f"{current_h:.1f}", "Last record humidity value.", "droplet"), unsafe_allow_html=True)
+with k3:
+    st.markdown(card_html("Current temperature", f"{current_t:.1f}", "Last record temperature value.", "thermometer"), unsafe_allow_html=True)
+with k4:
+    st.markdown(card_html("Current moisture index", f"{current_m:.1f}", "Last record MOI value.", "chip"), unsafe_allow_html=True)
 
 # ----------------------------
 # Alert system
@@ -196,8 +201,7 @@ else:
 # Visualizations
 # ----------------------------
 st.markdown('<div class="hr"></div>', unsafe_allow_html=True)
-
-col1, col2 = st.columns([1, 1])
+col1, col2 = st.columns([1, 1], gap="large")
 
 with col1:
     section_header("droplet", "Gauge: current humidity")
@@ -218,7 +222,7 @@ with col2:
     section_header(
         "chart_bar",
         "Trend: sensor averages by seedling stage",
-        "Dataset has no timestamp; stage ordering is used as a trend proxy."
+        "No timestamp available; stage ordering is used as a trend proxy."
     )
     stage_means = (
         dff.groupby("seedling_stage")[["moi", "temp", "humidity"]]
@@ -268,6 +272,6 @@ st.download_button(
 )
 
 st.markdown(
-    '<div class="small-note">Note: "current" refers to the last record in the dataset order due to absence of timestamp.</div>',
+    '<div class="small-note">Note: "current" refers to the last record due to absence of timestamp.</div>',
     unsafe_allow_html=True
 )
