@@ -125,9 +125,10 @@ Metrics are computed and stored in `outputs/data_quality_metrics.csv`.
 
 **Data Quality Results:**
 
-| Dataset | Rows | Cols | Missing Cells | Total Cells | Accuracy | Completeness | Timeliness (30d) | Note |
-|---|---:|---:|---:|---:|---:|---:|---:|---|
-| _Generate `outputs/data_quality_metrics.csv` to populate this table._ | | | | | | | | |
+| Dataset  | Rows   | Cols | Missing Cells | Total Cells | Accuracy | Completeness | Timeliness (30d) | Note                          |
+|----------|-------:|-----:|--------------:|------------:|---------:|-------------:|-----------------:|-------------------------------|
+| raw      | 16,411 |    7 |             0 |     114,877 |   1.0000 |       1.0000 | N/A              | No timestamp/datetime column  |
+| cleaned  | 16,283 |    7 |             0 |     113,981 |   1.0000 |       1.0000 | N/A              | No timestamp/datetime column  |
 
 > **Note on Accuracy:** The accuracy formula above is derived from missingness and therefore reflects completeness rather than true factual accuracy.
 >
