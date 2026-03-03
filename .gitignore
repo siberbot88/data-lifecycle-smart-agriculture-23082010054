@@ -1,0 +1,10 @@
+# secrets
+kaggle.json
+**/kaggle.json
+.kaggle/
+**/.kaggle/
+
+# common junk
+*.zip
+__pycache__/
+.ipynb_checkpoints/
